@@ -205,12 +205,16 @@ The running services need outbound network access to the hosts below. If your cl
 
 Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then push them to your own registry. Your cluster will pull only from your registry — Uniphore's ECR is a workstation-side source, not a cluster-side dependency.
 
-1. **Log in to Uniphore's ECR from your workstation** using the IAM credentials your account team shared (in 1Password):
+1. **Log in to Uniphore's ECR from your workstation** using the IAM credentials your account team shared (in 1Password). Make sure Docker Desktop (or your Docker daemon) is running first — `docker login` fails with a `docker.sock` connection error if it isn't.
 
     ```sh
     export AWS_ACCESS_KEY_ID=<ECR_ACCESS_KEY-from-1Password>
     export AWS_SECRET_ACCESS_KEY=<ECR_SECRET_ACCESS_KEY-from-1Password>
     export AWS_DEFAULT_REGION=us-west-2
+
+    # Verify the credentials resolve to the expected IAM principal
+    aws sts get-caller-identity
+    # Expected: Account=910083607482, Arn=arn:aws:iam::910083607482:user/ecr-pull-only
 
     aws ecr get-login-password --region us-west-2 \
       | docker login --username AWS --password-stdin 910083607482.dkr.ecr.us-west-2.amazonaws.com
@@ -223,7 +227,21 @@ Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then
 
     The ECR login token is valid for 12 hours; if you pause and resume the mirror step you may need to re-run both `login` commands.
 
-2. **Log in to your registry**, where you will push the mirrored artifacts. Example for a generic Docker registry:
+2. **Sanity-pull one image and one chart** to confirm the credentials and network egress work end-to-end before you kick off the bulk mirror loop. If either of these fails, fix the underlying issue (firewall, expired token, wrong key) before continuing — you don't want to discover it 12 images in.
+
+    ```sh
+    docker pull 910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/x-forge-ui:v-5568accafb
+    # → "Status: Downloaded newer image for ...x-forge-ui:v-5568accafb"
+
+    helm pull oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/guardrails-service \
+      --version 0.4.0-vcbe4adaa
+    # → "Pulled: ...uniphore-charts/guardrails-service:0.4.0-vcbe4adaa"
+    # → leaves guardrails-service-0.4.0-vcbe4adaa.tgz in the current directory
+    ```
+
+    If the `docker pull` fails with a TLS handshake or connect timeout, your corporate firewall is blocking outbound to `910083607482.dkr.ecr.us-west-2.amazonaws.com` (and the `*.s3.us-west-2.amazonaws.com` host that ECR layer blobs redirect to) — sort the egress before continuing.
+
+3. **Log in to your registry**, where you will push the mirrored artifacts. Example for a generic Docker registry:
 
     ```sh
     docker login registry.example.com -u '<YOUR-USERNAME>' -p '<YOUR-PASSWORD-OR-TOKEN>'
@@ -232,7 +250,7 @@ Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then
 
     For AWS ECR / GCP Artifact Registry / Azure ACR, use the respective CLI's login command instead.
 
-3. **Mirror the 14 container images.** Pull from Uniphore, re-tag for your registry, push:
+4. **Mirror the 14 container images.** Pull from Uniphore, re-tag for your registry, push:
 
     ```sh
     SRC="910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge"
@@ -264,7 +282,7 @@ Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then
 
     The image **tags** (right-hand side of the `:`) must remain unchanged — your `values.yaml` overlay ([Step 3](#step-3--author-your-valuesyaml-overlay)) references them by tag. You can structure the **path** under your registry however you like (`acme/baic/forge-backend`, `baic/forge-backend`, `forge-backend` at the root — all fine); just keep it in sync with the `__REGISTRY__` placeholder in your values overlay.
 
-4. **Mirror the 15 Helm charts.** Pull from Uniphore's ECR via `helm pull` (which downloads `.tgz` files), then push to your registry:
+5. **Mirror the 15 Helm charts.** Pull from Uniphore's ECR via `helm pull` (which downloads `.tgz` files), then push to your registry:
 
     ```sh
     SRC="oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts"
@@ -299,14 +317,14 @@ Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then
 
     If your registry is not OCI-compatible (e.g. a classical Harbor `chartmuseum`), keep the `.tgz` files locally and skip the `helm push` — you'll install directly from the local file in [Step 4](#step-4--install).
 
-5. **Create a dedicated namespace** for the BAIC release, and record it in a shell variable for the remaining steps:
+6. **Create a dedicated namespace** for the BAIC release, and record it in a shell variable for the remaining steps:
 
     ```sh
     NAMESPACE="baic"
     kubectl create namespace $NAMESPACE
     ```
 
-6. **Create the in-cluster image-pull Secret** using **your** registry's credentials. The Secret **must** be named `docker-config` — every subchart references that exact name:
+7. **Create the in-cluster image-pull Secret** using **your** registry's credentials. The Secret **must** be named `docker-config` — every subchart references that exact name:
 
     ```sh
     kubectl -n $NAMESPACE create secret docker-registry docker-config \
