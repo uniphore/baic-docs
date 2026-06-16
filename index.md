@@ -13,49 +13,51 @@ You will need to perform some of these steps from your local terminal (with `kub
 
 ## How the artifacts are delivered
 
-All charts and images are hosted in a Uniphore-owned AWS ECR. Your Uniphore account team will issue you an AWS IAM credential pair (`ECR_ACCESS_KEY` + `ECR_SECRET_ACCESS_KEY`) scoped to read-only pull access. You use those credentials to **pull** charts and images from Uniphore's ECR, then **re-publish** to a container registry you control (Harbor, Artifactory, your own AWS ECR, GCR, Azure ACR, GitLab Container Registry, etc.). The cluster pulls only from your registry — Uniphore's ECR is reachable from your workstation, not from your cluster nodes.
+All charts and images are hosted in the Uniphore Harbor registry at `registry.uniphore.com`, in a project dedicated to your tenant (e.g. `customer-hpe`). Your Uniphore account team will share a pull-only Harbor **robot account** credential pair (username + token) via 1Password. You use those credentials to **pull** charts and images from Uniphore's Harbor, then **re-publish** to a container registry you control (Harbor, Artifactory, AWS ECR, GCR, Azure ACR, GitLab Container Registry, etc.). The cluster pulls only from your registry — Uniphore's Harbor is reachable from your workstation, not from your cluster nodes.
 
-The exact artifacts for your release:
+The exact artifacts for your release (substitute `customer-hpe` with your assigned project slug):
 
-**Source registry (Uniphore):** `910083607482.dkr.ecr.us-west-2.amazonaws.com`
+**Source registry (Uniphore):** `registry.uniphore.com`
 
-**Umbrella + service Helm charts** (15 OCI artifacts under `uniphore-charts/`):
+**Source project:** `customer-hpe` (your account team will confirm the slug for your tenant)
+
+**Umbrella + service Helm charts** (15 OCI artifacts under `customer-hpe/charts/`):
 
 ```text
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/uniphore-baic:0.1.0
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/xforge-db:0.1.0-v7bf3eea5
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/forge-backend:0.3.1-v49331f7d
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/forge-user-management:0.3.0-vff35cc44
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/forge-scheduler:0.2.0-v3e63599f
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/forge-api-gateway:0.2.0-v9b49161f
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/x-forge-ui:0.2.0-vc5680ec1
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/forge-question-answer:0.3.0-v85aa96d0
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/evaluation-service:0.6.0-v2153d752
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/pegasus-inference-api:1.4.0-ve812e651
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/guardrails-service:0.4.0-vcbe4adaa
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/slm-fine-tuning-studio:0.3.0-vdbafed12
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/autonomous-entity-label-extraction:0.3.0-v4216764a
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/deep-crawler:0.3.0-v992450ae
-oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/document-categorizer:0.3.0-v8c455a3d
+oci://registry.uniphore.com/customer-hpe/charts/uniphore-baic:0.1.0
+oci://registry.uniphore.com/customer-hpe/charts/xforge-db:0.1.0-v7bf3eea5
+oci://registry.uniphore.com/customer-hpe/charts/forge-backend:0.3.1-v49331f7d
+oci://registry.uniphore.com/customer-hpe/charts/forge-user-management:0.3.0-vff35cc44
+oci://registry.uniphore.com/customer-hpe/charts/forge-scheduler:0.2.0-v3e63599f
+oci://registry.uniphore.com/customer-hpe/charts/forge-api-gateway:0.2.0-v9b49161f
+oci://registry.uniphore.com/customer-hpe/charts/x-forge-ui:0.2.0-vc5680ec1
+oci://registry.uniphore.com/customer-hpe/charts/forge-question-answer:0.3.0-v85aa96d0
+oci://registry.uniphore.com/customer-hpe/charts/evaluation-service:0.6.0-v2153d752
+oci://registry.uniphore.com/customer-hpe/charts/pegasus-inference-api:1.4.0-ve812e651
+oci://registry.uniphore.com/customer-hpe/charts/guardrails-service:0.4.0-vcbe4adaa
+oci://registry.uniphore.com/customer-hpe/charts/slm-fine-tuning-studio:0.3.0-vdbafed12
+oci://registry.uniphore.com/customer-hpe/charts/autonomous-entity-label-extraction:0.3.0-v4216764a
+oci://registry.uniphore.com/customer-hpe/charts/deep-crawler:0.3.0-v992450ae
+oci://registry.uniphore.com/customer-hpe/charts/document-categorizer:0.3.0-v8c455a3d
 ```
 
-**Container images** (14 images under `xforge/`):
+**Container images** (14 images under `customer-hpe/images/`):
 
 ```text
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/forge-backend:v-9df59a3eca
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/forge-user-management:v-e580289a8c
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/forge-scheduler:v-7f2825e51f
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/forge-api-gateway:v-c2c860f150
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/x-forge-ui:v-5568accafb
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/forge-question-answer:v-17b34f7913
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/evaluation-service:v-4f32acbf1d
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/pegasus-inference-api:v-2f329891fc
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/guardrails-service:v-b3562c3323
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/slm-fine-tuning-studio:v-44a31dd636
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/autonomous-entity-label-extraction:v-dec4a11e29
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/deep-crawler:v-a43f5e057a
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/document-categorizer:v-681bf47d44
-910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/xforge-db-migrations:v-86af973b41
+registry.uniphore.com/customer-hpe/images/forge-backend:v-9df59a3eca
+registry.uniphore.com/customer-hpe/images/forge-user-management:v-e580289a8c
+registry.uniphore.com/customer-hpe/images/forge-scheduler:v-7f2825e51f
+registry.uniphore.com/customer-hpe/images/forge-api-gateway:v-c2c860f150
+registry.uniphore.com/customer-hpe/images/x-forge-ui:v-5568accafb
+registry.uniphore.com/customer-hpe/images/forge-question-answer:v-17b34f7913
+registry.uniphore.com/customer-hpe/images/evaluation-service:v-4f32acbf1d
+registry.uniphore.com/customer-hpe/images/pegasus-inference-api:v-2f329891fc
+registry.uniphore.com/customer-hpe/images/guardrails-service:v-b3562c3323
+registry.uniphore.com/customer-hpe/images/slm-fine-tuning-studio:v-44a31dd636
+registry.uniphore.com/customer-hpe/images/autonomous-entity-label-extraction:v-dec4a11e29
+registry.uniphore.com/customer-hpe/images/deep-crawler:v-a43f5e057a
+registry.uniphore.com/customer-hpe/images/document-categorizer:v-681bf47d44
+registry.uniphore.com/customer-hpe/images/xforge-db-migrations:v-86af973b41
 ```
 
 [Step 1](#step-1--mirror-images-and-charts-into-your-registry) walks through pulling, re-tagging, and pushing these to your registry.
@@ -141,16 +143,16 @@ If you'd rather run Liquibase from your own CI / DBA tooling, set `xforge-db.ena
 
 ## Container registry (yours)
 
-You will mirror the BAIC charts and images into a container registry you control (Harbor, Artifactory, your own AWS ECR, GCR, Azure ACR, GitLab Container Registry, etc.). Uniphore's ECR is reachable from your workstation (via the IAM creds we issued) but **not** intended to be reachable from your cluster nodes — your cluster pulls only from your registry.
+You will mirror the BAIC charts and images into a container registry you control (Harbor, Artifactory, AWS ECR, GCR, Azure ACR, GitLab Container Registry, etc.). Uniphore's Harbor is reachable from your workstation (via the robot account credentials we issued) but **not** intended to be reachable from your cluster nodes — your cluster pulls only from your registry.
 
 Before installation, make sure:
 
 - Your cluster's worker nodes have network reachability to **your** registry endpoint.
 - You have a Docker-registry credential (username + password / token / IAM role) on your registry that allows pulling.
-- You have AWS CLI configured with the `ECR_ACCESS_KEY` / `ECR_SECRET_ACCESS_KEY` Uniphore issued, so you can pull from `910083607482.dkr.ecr.us-west-2.amazonaws.com`. Test:
+- You have the Harbor robot username + token Uniphore issued via 1Password, and your workstation has outbound network access to `registry.uniphore.com` (HTTPS / 443). Test:
    ```sh
-   aws ecr get-login-password --region us-west-2 \
-     | docker login --username AWS --password-stdin 910083607482.dkr.ecr.us-west-2.amazonaws.com
+   echo "$HARBOR_TOKEN" \
+     | docker login registry.uniphore.com --username "$HARBOR_USERNAME" --password-stdin
    # → "Login Succeeded"
    ```
 - You can create a `kubernetes.io/dockerconfigjson` Secret in the install namespace using your registry's credential ([Step 1](#step-1--mirror-images-and-charts-into-your-registry)).
@@ -165,11 +167,11 @@ Before installation, your Uniphore account team will provide:
 | JWT key-pair (PEM) | Token signing key-pair for forge-user-management |
 | `MASTER_KEY_TOKEN_MGMT` | Symmetric key for credential encryption inside the platform |
 | `LD_SDK_KEY` | LaunchDarkly server SDK key — feature-flag evaluation for forge-backend, forge-question-answer, pegasus-inference-api |
-| `ECR_ACCESS_KEY` + `ECR_SECRET_ACCESS_KEY` | AWS IAM credentials for pulling BAIC Helm charts and container images from the Uniphore-hosted ECR |
+| `HARBOR_USERNAME` + `HARBOR_TOKEN` | Pull-only Harbor robot credentials for `registry.uniphore.com/<your-customer-project>/*`. Delivered via 1Password. Format: `robot$<your-customer-project>+<your-customer-project>-puller` plus a long-lived token. |
 | (Optional) LLM provider API keys | OpenAI, Anthropic, Fireworks, etc. — only the providers you plan to use |
 | (Optional) Tenant UUID + name | Your assigned tenant identifier, used as the `tenant.id` value in your overlay |
 
-You'll plug these into Kubernetes Secrets in [Step 2](#step-2--create-the-prerequisite-secrets).
+You'll plug these into Kubernetes Secrets in [Step 2](#step-2--create-the-prerequisite-secrets). The Harbor credentials are workstation-side only — they're used to mirror artifacts in [Step 1](#step-1--mirror-images-and-charts-into-your-registry) and are not loaded into the cluster.
 
 ## Network egress allowlist
 
@@ -203,43 +205,40 @@ The running services need outbound network access to the hosts below. If your cl
 
 # Step 1 — Mirror images and charts into your registry
 
-Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then push them to your own registry. Your cluster will pull only from your registry — Uniphore's ECR is a workstation-side source, not a cluster-side dependency.
+Pull each artifact from Uniphore's Harbor registry using the robot account credentials we shared via 1Password, then push them to your own registry. Your cluster will pull only from your registry — Uniphore's Harbor is a workstation-side source, not a cluster-side dependency.
 
-1. **Log in to Uniphore's ECR from your workstation** using the IAM credentials your account team shared (in 1Password). Make sure Docker Desktop (or your Docker daemon) is running first — `docker login` fails with a `docker.sock` connection error if it isn't.
+1. **Log in to Uniphore's Harbor from your workstation** using the robot account credentials your account team shared in 1Password. Make sure Docker Desktop (or your Docker daemon) is running first — `docker login` fails with a `docker.sock` connection error if it isn't.
+
+    The robot username contains a `$` which the shell will try to interpret — **always quote it with single quotes**:
 
     ```sh
-    export AWS_ACCESS_KEY_ID=<ECR_ACCESS_KEY-from-1Password>
-    export AWS_SECRET_ACCESS_KEY=<ECR_SECRET_ACCESS_KEY-from-1Password>
-    export AWS_DEFAULT_REGION=us-west-2
+    export HARBOR_USERNAME='robot$customer-hpe+customer-hpe-puller'   # from 1Password
+    export HARBOR_TOKEN='<paste-token-from-1Password>'
 
-    # Verify the credentials resolve to the expected IAM principal
-    aws sts get-caller-identity
-    # Expected: Account=910083607482, Arn=arn:aws:iam::910083607482:user/ecr-pull-only
-
-    aws ecr get-login-password --region us-west-2 \
-      | docker login --username AWS --password-stdin 910083607482.dkr.ecr.us-west-2.amazonaws.com
+    echo "$HARBOR_TOKEN" \
+      | docker login registry.uniphore.com --username "$HARBOR_USERNAME" --password-stdin
     # → Login Succeeded
 
-    aws ecr get-login-password --region us-west-2 \
-      | helm registry login --username AWS --password-stdin 910083607482.dkr.ecr.us-west-2.amazonaws.com
+    echo "$HARBOR_TOKEN" \
+      | helm registry login registry.uniphore.com --username "$HARBOR_USERNAME" --password-stdin
     # → Login Succeeded
     ```
 
-    The ECR login token is valid for 12 hours; if you pause and resume the mirror step you may need to re-run both `login` commands.
+    The Harbor robot token is long-lived (no expiration by default), so you only need to log in once per workstation. Rotate by asking Uniphore to issue a new token if you suspect the existing one is compromised.
 
-2. **Sanity-pull one image and one chart** to confirm the credentials and network egress work end-to-end before you kick off the bulk mirror loop. If either of these fails, fix the underlying issue (firewall, expired token, wrong key) before continuing — you don't want to discover it 12 images in.
+2. **Sanity-pull one image and one chart** to confirm the credentials and network egress work end-to-end before you kick off the bulk mirror loop. If either of these fails, fix the underlying issue (firewall, wrong token, wrong project slug) before continuing — you don't want to discover it 12 images in.
 
     ```sh
-    docker pull 910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge/x-forge-ui:v-5568accafb
+    docker pull registry.uniphore.com/customer-hpe/images/x-forge-ui:v-5568accafb
     # → "Status: Downloaded newer image for ...x-forge-ui:v-5568accafb"
 
-    helm pull oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts/guardrails-service \
+    helm pull oci://registry.uniphore.com/customer-hpe/charts/guardrails-service \
       --version 0.4.0-vcbe4adaa
-    # → "Pulled: ...uniphore-charts/guardrails-service:0.4.0-vcbe4adaa"
+    # → "Pulled: ...customer-hpe/charts/guardrails-service:0.4.0-vcbe4adaa"
     # → leaves guardrails-service-0.4.0-vcbe4adaa.tgz in the current directory
     ```
 
-    If the `docker pull` fails with a TLS handshake or connect timeout, your corporate firewall is blocking outbound to `910083607482.dkr.ecr.us-west-2.amazonaws.com` (and the `*.s3.us-west-2.amazonaws.com` host that ECR layer blobs redirect to) — sort the egress before continuing.
+    If the `docker pull` fails with a TLS handshake or connect timeout, your corporate firewall is blocking outbound to `registry.uniphore.com` — sort the egress before continuing. A `401 unauthorized` typically means the `docker login` step didn't run or your robot token is wrong.
 
 3. **Log in to your registry**, where you will push the mirrored artifacts. Example for a generic Docker registry:
 
@@ -250,10 +249,11 @@ Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then
 
     For AWS ECR / GCP Artifact Registry / Azure ACR, use the respective CLI's login command instead.
 
-4. **Mirror the 14 container images.** Pull from Uniphore, re-tag for your registry, push:
+4. **Mirror the 14 container images.** Pull from Uniphore's Harbor, re-tag for your registry, push:
 
     ```sh
-    SRC="910083607482.dkr.ecr.us-west-2.amazonaws.com/xforge"
+    UNIPHORE_PROJECT="customer-hpe"        # your account team will confirm this
+    SRC="registry.uniphore.com/${UNIPHORE_PROJECT}/images"
     DST="registry.example.com/baic"        # your registry — and any namespace/project you want
 
     IMAGES=(
@@ -282,10 +282,11 @@ Pull each artifact from Uniphore's ECR using the IAM credentials we issued, then
 
     The image **tags** (right-hand side of the `:`) must remain unchanged — your `values.yaml` overlay ([Step 3](#step-3--author-your-valuesyaml-overlay)) references them by tag. You can structure the **path** under your registry however you like (`acme/baic/forge-backend`, `baic/forge-backend`, `forge-backend` at the root — all fine); just keep it in sync with the `__REGISTRY__` placeholder in your values overlay.
 
-5. **Mirror the 15 Helm charts.** Pull from Uniphore's ECR via `helm pull` (which downloads `.tgz` files), then push to your registry:
+5. **Mirror the 15 Helm charts.** Pull from Uniphore's Harbor via `helm pull` (which downloads `.tgz` files), then push to your registry:
 
     ```sh
-    SRC="oci://910083607482.dkr.ecr.us-west-2.amazonaws.com/uniphore-charts"
+    UNIPHORE_PROJECT="customer-hpe"        # same value as in the images loop above
+    SRC="oci://registry.uniphore.com/${UNIPHORE_PROJECT}/charts"
     DST="oci://registry.example.com/baic-charts"   # your OCI-compatible registry
 
     CHARTS=(
@@ -717,7 +718,7 @@ curl -X POST "https://api.baic.example.com/v1/question-answer/ask" \
 
 ## Upgrading
 
-When Uniphore publishes a new chart + image set to ECR (your account team will share the new chart versions + image tags):
+When Uniphore publishes a new chart + image set to Harbor (your account team will share the new chart versions + image tags):
 
 1. Re-run the mirror loop from [Step 1](#step-1--mirror-images-and-charts-into-your-registry) with the new versions in the `IMAGES` and `CHARTS` arrays.
 2. Update the image tags in your `my-values.yaml` overlay to match the new release.
