@@ -24,7 +24,7 @@ The exact artifacts for your release (substitute `customer-hpe` with your assign
 **Umbrella + service Helm charts** (15 OCI artifacts under `customer-hpe-charts/`):
 
 ```text
-oci://registry.uniphore.com/customer-hpe-charts/uniphore-baic:0.1.0
+oci://registry.uniphore.com/customer-hpe-charts/uniphore-baic:0.1.1
 oci://registry.uniphore.com/customer-hpe-charts/xforge-db:0.1.0-v7bf3eea5
 oci://registry.uniphore.com/customer-hpe-charts/forge-backend:0.1.0-v4f170843
 oci://registry.uniphore.com/customer-hpe-charts/forge-user-management:0.3.1-v1e67bcd0
@@ -290,7 +290,7 @@ Pull each artifact from Uniphore's Harbor registry using the robot account crede
     DST="oci://registry.example.com/baic-charts"   # your OCI-compatible registry
 
     CHARTS=(
-      "uniphore-baic:0.1.0"
+      "uniphore-baic:0.1.1"
       "xforge-db:0.1.0-v7bf3eea5"
       "forge-backend:0.1.0-v4f170843"
       "forge-user-management:0.3.1-v1e67bcd0"
