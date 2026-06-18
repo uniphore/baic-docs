@@ -13,51 +13,51 @@ You will need to perform some of these steps from your local terminal (with `kub
 
 ## How the artifacts are delivered
 
-All charts and images are hosted in the Uniphore Harbor registry at `registry.uniphore.com`, in a project dedicated to your tenant (e.g. `customer-hpe`). Your Uniphore account team will share a pull-only Harbor **robot account** credential pair (username + token) via 1Password. You use those credentials to **pull** charts and images from Uniphore's Harbor, then **re-publish** to a container registry you control (Harbor, Artifactory, AWS ECR, GCR, Azure ACR, GitLab Container Registry, etc.). The cluster pulls only from your registry — Uniphore's Harbor is reachable from your workstation, not from your cluster nodes.
+All charts and images are hosted in the Uniphore Harbor registry at `registry.uniphore.com`, in **two per-tenant projects**: `customer-<slug>-images` for container images and `customer-<slug>-charts` for Helm charts (e.g. `customer-hpe-images` and `customer-hpe-charts`). Your Uniphore account team will share a pull-only Harbor **robot account** credential pair (username + token) via 1Password — one robot with read access to both projects. You use those credentials to **pull** charts and images from Uniphore's Harbor, then **re-publish** to a container registry you control (Harbor, Artifactory, AWS ECR, GCR, Azure ACR, GitLab Container Registry, etc.). The cluster pulls only from your registry — Uniphore's Harbor is reachable from your workstation, not from your cluster nodes.
 
 The exact artifacts for your release (substitute `customer-hpe` with your assigned project slug):
 
 **Source registry (Uniphore):** `registry.uniphore.com`
 
-**Source project:** `customer-hpe` (your account team will confirm the slug for your tenant)
+**Source projects:** `customer-hpe-images` (container images) and `customer-hpe-charts` (Helm charts) — your account team will confirm the slug for your tenant.
 
-**Umbrella + service Helm charts** (15 OCI artifacts under `customer-hpe/charts/`):
+**Umbrella + service Helm charts** (15 OCI artifacts under `customer-hpe-charts/`):
 
 ```text
-oci://registry.uniphore.com/customer-hpe/charts/uniphore-baic:0.1.0
-oci://registry.uniphore.com/customer-hpe/charts/xforge-db:0.1.0-v7bf3eea5
-oci://registry.uniphore.com/customer-hpe/charts/forge-backend:0.3.1-v49331f7d
-oci://registry.uniphore.com/customer-hpe/charts/forge-user-management:0.3.0-vff35cc44
-oci://registry.uniphore.com/customer-hpe/charts/forge-scheduler:0.2.0-v3e63599f
-oci://registry.uniphore.com/customer-hpe/charts/forge-api-gateway:0.2.0-v9b49161f
-oci://registry.uniphore.com/customer-hpe/charts/x-forge-ui:0.2.0-vc5680ec1
-oci://registry.uniphore.com/customer-hpe/charts/forge-question-answer:0.3.0-v85aa96d0
-oci://registry.uniphore.com/customer-hpe/charts/evaluation-service:0.6.0-v2153d752
-oci://registry.uniphore.com/customer-hpe/charts/pegasus-inference-api:1.4.0-ve812e651
-oci://registry.uniphore.com/customer-hpe/charts/guardrails-service:0.4.0-vcbe4adaa
-oci://registry.uniphore.com/customer-hpe/charts/slm-fine-tuning-studio:0.3.0-vdbafed12
-oci://registry.uniphore.com/customer-hpe/charts/autonomous-entity-label-extraction:0.3.0-v4216764a
-oci://registry.uniphore.com/customer-hpe/charts/deep-crawler:0.3.0-v992450ae
-oci://registry.uniphore.com/customer-hpe/charts/document-categorizer:0.3.0-v8c455a3d
+oci://registry.uniphore.com/customer-hpe-charts/uniphore-baic:0.1.1
+oci://registry.uniphore.com/customer-hpe-charts/xforge-db:0.1.0-v7bf3eea5
+oci://registry.uniphore.com/customer-hpe-charts/forge-backend:0.1.0-v4f170843
+oci://registry.uniphore.com/customer-hpe-charts/forge-user-management:0.3.1-v1e67bcd0
+oci://registry.uniphore.com/customer-hpe-charts/forge-scheduler:0.2.0-v29230c02
+oci://registry.uniphore.com/customer-hpe-charts/forge-api-gateway:0.2.0-vd3efeb07
+oci://registry.uniphore.com/customer-hpe-charts/x-forge-ui:0.2.0-ve7702551
+oci://registry.uniphore.com/customer-hpe-charts/forge-question-answer:0.3.0-v7e68a480
+oci://registry.uniphore.com/customer-hpe-charts/evaluation-service:0.6.0-va7a27bd2
+oci://registry.uniphore.com/customer-hpe-charts/pegasus-inference-api:1.4.0-v4ba1f434
+oci://registry.uniphore.com/customer-hpe-charts/guardrails-service:0.4.0-vdf7c1ace
+oci://registry.uniphore.com/customer-hpe-charts/slm-fine-tuning-studio:0.3.0-v0fe55339
+oci://registry.uniphore.com/customer-hpe-charts/autonomous-entity-label-extraction:0.3.0-vce9fd5db
+oci://registry.uniphore.com/customer-hpe-charts/deep-crawler:0.3.0-v16712cf8
+oci://registry.uniphore.com/customer-hpe-charts/document-categorizer:0.3.0-vd8c49a51
 ```
 
-**Container images** (14 images under `customer-hpe/images/`):
+**Container images** (14 images under `customer-hpe-images/`):
 
 ```text
-registry.uniphore.com/customer-hpe/images/forge-backend:v-9df59a3eca
-registry.uniphore.com/customer-hpe/images/forge-user-management:v-e580289a8c
-registry.uniphore.com/customer-hpe/images/forge-scheduler:v-7f2825e51f
-registry.uniphore.com/customer-hpe/images/forge-api-gateway:v-c2c860f150
-registry.uniphore.com/customer-hpe/images/x-forge-ui:v-5568accafb
-registry.uniphore.com/customer-hpe/images/forge-question-answer:v-17b34f7913
-registry.uniphore.com/customer-hpe/images/evaluation-service:v-4f32acbf1d
-registry.uniphore.com/customer-hpe/images/pegasus-inference-api:v-2f329891fc
-registry.uniphore.com/customer-hpe/images/guardrails-service:v-b3562c3323
-registry.uniphore.com/customer-hpe/images/slm-fine-tuning-studio:v-44a31dd636
-registry.uniphore.com/customer-hpe/images/autonomous-entity-label-extraction:v-dec4a11e29
-registry.uniphore.com/customer-hpe/images/deep-crawler:v-a43f5e057a
-registry.uniphore.com/customer-hpe/images/document-categorizer:v-681bf47d44
-registry.uniphore.com/customer-hpe/images/xforge-db-migrations:v-86af973b41
+registry.uniphore.com/customer-hpe-images/forge-backend:v-a5fd46a64a
+registry.uniphore.com/customer-hpe-images/forge-user-management:v-e5a88c390e
+registry.uniphore.com/customer-hpe-images/forge-scheduler:v-ae9bf06d0e
+registry.uniphore.com/customer-hpe-images/forge-api-gateway:v-6fc8dcf1b0
+registry.uniphore.com/customer-hpe-images/x-forge-ui:v-95ad0f2929
+registry.uniphore.com/customer-hpe-images/forge-question-answer:v-a6082e4173
+registry.uniphore.com/customer-hpe-images/evaluation-service:v-7754c8bc2b
+registry.uniphore.com/customer-hpe-images/pegasus-inference-api:v-9640234c30
+registry.uniphore.com/customer-hpe-images/guardrails-service:v-4f5021217f
+registry.uniphore.com/customer-hpe-images/slm-fine-tuning-studio:v-50de83304c
+registry.uniphore.com/customer-hpe-images/autonomous-entity-label-extraction:v-b9394104cf
+registry.uniphore.com/customer-hpe-images/deep-crawler:v-bd43605219
+registry.uniphore.com/customer-hpe-images/document-categorizer:v-765ee9f4c7
+registry.uniphore.com/customer-hpe-images/xforge-db-migrations:v-86af973b41
 ```
 
 [Step 1](#step-1--mirror-images-and-charts-into-your-registry) walks through pulling, re-tagging, and pushing these to your registry.
@@ -229,13 +229,13 @@ Pull each artifact from Uniphore's Harbor registry using the robot account crede
 2. **Sanity-pull one image and one chart** to confirm the credentials and network egress work end-to-end before you kick off the bulk mirror loop. If either of these fails, fix the underlying issue (firewall, wrong token, wrong project slug) before continuing — you don't want to discover it 12 images in.
 
     ```sh
-    docker pull registry.uniphore.com/customer-hpe/images/x-forge-ui:v-5568accafb
-    # → "Status: Downloaded newer image for ...x-forge-ui:v-5568accafb"
+    docker pull registry.uniphore.com/customer-hpe-images/x-forge-ui:v-95ad0f2929
+    # → "Status: Downloaded newer image for ...x-forge-ui:v-95ad0f2929"
 
-    helm pull oci://registry.uniphore.com/customer-hpe/charts/guardrails-service \
-      --version 0.4.0-vcbe4adaa
-    # → "Pulled: ...customer-hpe/charts/guardrails-service:0.4.0-vcbe4adaa"
-    # → leaves guardrails-service-0.4.0-vcbe4adaa.tgz in the current directory
+    helm pull oci://registry.uniphore.com/customer-hpe-charts/guardrails-service \
+      --version 0.4.0-vdf7c1ace
+    # → "Pulled: ...customer-hpe-charts/guardrails-service:0.4.0-vdf7c1ace"
+    # → leaves guardrails-service-0.4.0-vdf7c1ace.tgz in the current directory
     ```
 
     If the `docker pull` fails with a TLS handshake or connect timeout, your corporate firewall is blocking outbound to `registry.uniphore.com` — sort the egress before continuing. A `401 unauthorized` typically means the `docker login` step didn't run or your robot token is wrong.
@@ -252,24 +252,24 @@ Pull each artifact from Uniphore's Harbor registry using the robot account crede
 4. **Mirror the 14 container images.** Pull from Uniphore's Harbor, re-tag for your registry, push:
 
     ```sh
-    UNIPHORE_PROJECT="customer-hpe"        # your account team will confirm this
-    SRC="registry.uniphore.com/${UNIPHORE_PROJECT}/images"
+    UNIPHORE_SLUG="customer-hpe"           # your account team will confirm this
+    SRC="registry.uniphore.com/${UNIPHORE_SLUG}-images"
     DST="registry.example.com/baic"        # your registry — and any namespace/project you want
 
     IMAGES=(
-      "forge-backend:v-9df59a3eca"
-      "forge-user-management:v-e580289a8c"
-      "forge-scheduler:v-7f2825e51f"
-      "forge-api-gateway:v-c2c860f150"
-      "x-forge-ui:v-5568accafb"
-      "forge-question-answer:v-17b34f7913"
-      "evaluation-service:v-4f32acbf1d"
-      "pegasus-inference-api:v-2f329891fc"
-      "guardrails-service:v-b3562c3323"
-      "slm-fine-tuning-studio:v-44a31dd636"
-      "autonomous-entity-label-extraction:v-dec4a11e29"
-      "deep-crawler:v-a43f5e057a"
-      "document-categorizer:v-681bf47d44"
+      "forge-backend:v-a5fd46a64a"
+      "forge-user-management:v-e5a88c390e"
+      "forge-scheduler:v-ae9bf06d0e"
+      "forge-api-gateway:v-6fc8dcf1b0"
+      "x-forge-ui:v-95ad0f2929"
+      "forge-question-answer:v-a6082e4173"
+      "evaluation-service:v-7754c8bc2b"
+      "pegasus-inference-api:v-9640234c30"
+      "guardrails-service:v-4f5021217f"
+      "slm-fine-tuning-studio:v-50de83304c"
+      "autonomous-entity-label-extraction:v-b9394104cf"
+      "deep-crawler:v-bd43605219"
+      "document-categorizer:v-765ee9f4c7"
       "xforge-db-migrations:v-86af973b41"
     )
 
@@ -285,26 +285,26 @@ Pull each artifact from Uniphore's Harbor registry using the robot account crede
 5. **Mirror the 15 Helm charts.** Pull from Uniphore's Harbor via `helm pull` (which downloads `.tgz` files), then push to your registry:
 
     ```sh
-    UNIPHORE_PROJECT="customer-hpe"        # same value as in the images loop above
-    SRC="oci://registry.uniphore.com/${UNIPHORE_PROJECT}/charts"
+    UNIPHORE_SLUG="customer-hpe"           # same value as in the images loop above
+    SRC="oci://registry.uniphore.com/${UNIPHORE_SLUG}-charts"
     DST="oci://registry.example.com/baic-charts"   # your OCI-compatible registry
 
     CHARTS=(
-      "uniphore-baic:0.1.0"
+      "uniphore-baic:0.1.1"
       "xforge-db:0.1.0-v7bf3eea5"
-      "forge-backend:0.3.1-v49331f7d"
-      "forge-user-management:0.3.0-vff35cc44"
-      "forge-scheduler:0.2.0-v3e63599f"
-      "forge-api-gateway:0.2.0-v9b49161f"
-      "x-forge-ui:0.2.0-vc5680ec1"
-      "forge-question-answer:0.3.0-v85aa96d0"
-      "evaluation-service:0.6.0-v2153d752"
-      "pegasus-inference-api:1.4.0-ve812e651"
-      "guardrails-service:0.4.0-vcbe4adaa"
-      "slm-fine-tuning-studio:0.3.0-vdbafed12"
-      "autonomous-entity-label-extraction:0.3.0-v4216764a"
-      "deep-crawler:0.3.0-v992450ae"
-      "document-categorizer:0.3.0-v8c455a3d"
+      "forge-backend:0.1.0-v4f170843"
+      "forge-user-management:0.3.1-v1e67bcd0"
+      "forge-scheduler:0.2.0-v29230c02"
+      "forge-api-gateway:0.2.0-vd3efeb07"
+      "x-forge-ui:0.2.0-ve7702551"
+      "forge-question-answer:0.3.0-v7e68a480"
+      "evaluation-service:0.6.0-va7a27bd2"
+      "pegasus-inference-api:1.4.0-v4ba1f434"
+      "guardrails-service:0.4.0-vdf7c1ace"
+      "slm-fine-tuning-studio:0.3.0-v0fe55339"
+      "autonomous-entity-label-extraction:0.3.0-vce9fd5db"
+      "deep-crawler:0.3.0-v16712cf8"
+      "document-categorizer:0.3.0-vd8c49a51"
     )
 
     mkdir -p /tmp/baic-charts && cd /tmp/baic-charts
