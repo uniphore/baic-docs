@@ -24,40 +24,40 @@ The exact artifacts for your release (substitute `customer-hpe` with your assign
 **Umbrella + service Helm charts** (15 OCI artifacts under `customer-hpe-charts/`):
 
 ```text
-oci://registry.uniphore.com/customer-hpe-charts/uniphore-baic:0.1.1
-oci://registry.uniphore.com/customer-hpe-charts/xforge-db:0.1.0-v7bf3eea5
-oci://registry.uniphore.com/customer-hpe-charts/forge-backend:0.1.0-v4f170843
-oci://registry.uniphore.com/customer-hpe-charts/forge-user-management:0.3.1-v1e67bcd0
+oci://registry.uniphore.com/customer-hpe-charts/uniphore-baic:0.1.2
+oci://registry.uniphore.com/customer-hpe-charts/xforge-db:0.1.0-vd4facb00
+oci://registry.uniphore.com/customer-hpe-charts/forge-backend:0.1.0-v283fbf52
+oci://registry.uniphore.com/customer-hpe-charts/forge-user-management:0.3.1-v2eb536a6
 oci://registry.uniphore.com/customer-hpe-charts/forge-scheduler:0.2.0-v29230c02
 oci://registry.uniphore.com/customer-hpe-charts/forge-api-gateway:0.2.0-vd3efeb07
-oci://registry.uniphore.com/customer-hpe-charts/x-forge-ui:0.2.0-ve7702551
-oci://registry.uniphore.com/customer-hpe-charts/forge-question-answer:0.3.0-v7e68a480
-oci://registry.uniphore.com/customer-hpe-charts/evaluation-service:0.6.0-va7a27bd2
-oci://registry.uniphore.com/customer-hpe-charts/pegasus-inference-api:1.4.0-v4ba1f434
+oci://registry.uniphore.com/customer-hpe-charts/x-forge-ui:0.2.0-ve53e19a4
+oci://registry.uniphore.com/customer-hpe-charts/forge-question-answer:0.3.0-v9677d889
+oci://registry.uniphore.com/customer-hpe-charts/evaluation-service:0.6.0-v4539c0d9
+oci://registry.uniphore.com/customer-hpe-charts/pegasus-inference-api:1.4.0-v5eb5ca4a
 oci://registry.uniphore.com/customer-hpe-charts/guardrails-service:0.4.0-vdf7c1ace
-oci://registry.uniphore.com/customer-hpe-charts/slm-fine-tuning-studio:0.3.0-v0fe55339
+oci://registry.uniphore.com/customer-hpe-charts/slm-fine-tuning-studio:0.3.0-v53d24b13
 oci://registry.uniphore.com/customer-hpe-charts/autonomous-entity-label-extraction:0.3.0-vce9fd5db
 oci://registry.uniphore.com/customer-hpe-charts/deep-crawler:0.3.0-v16712cf8
-oci://registry.uniphore.com/customer-hpe-charts/document-categorizer:0.3.0-vd8c49a51
+oci://registry.uniphore.com/customer-hpe-charts/document-categorizer:0.3.0-v0aad579d
 ```
 
 **Container images** (14 images under `customer-hpe-images/`):
 
 ```text
-registry.uniphore.com/customer-hpe-images/forge-backend:v-a5fd46a64a
-registry.uniphore.com/customer-hpe-images/forge-user-management:v-e5a88c390e
+registry.uniphore.com/customer-hpe-images/forge-backend:v-6b47a82445
+registry.uniphore.com/customer-hpe-images/forge-user-management:v-b893347668
 registry.uniphore.com/customer-hpe-images/forge-scheduler:v-ae9bf06d0e
 registry.uniphore.com/customer-hpe-images/forge-api-gateway:v-6fc8dcf1b0
-registry.uniphore.com/customer-hpe-images/x-forge-ui:v-95ad0f2929
-registry.uniphore.com/customer-hpe-images/forge-question-answer:v-a6082e4173
-registry.uniphore.com/customer-hpe-images/evaluation-service:v-7754c8bc2b
-registry.uniphore.com/customer-hpe-images/pegasus-inference-api:v-9640234c30
-registry.uniphore.com/customer-hpe-images/guardrails-service:v-4f5021217f
-registry.uniphore.com/customer-hpe-images/slm-fine-tuning-studio:v-50de83304c
+registry.uniphore.com/customer-hpe-images/x-forge-ui:v-67659ecdef
+registry.uniphore.com/customer-hpe-images/forge-question-answer:v-82208cd3df
+registry.uniphore.com/customer-hpe-images/evaluation-service:v-c315fe70e1
+registry.uniphore.com/customer-hpe-images/pegasus-inference-api:v-40c1eb8b43
+registry.uniphore.com/customer-hpe-images/guardrails-service:v-b357c2ce22
+registry.uniphore.com/customer-hpe-images/slm-fine-tuning-studio:v-49c1599d25
 registry.uniphore.com/customer-hpe-images/autonomous-entity-label-extraction:v-b9394104cf
-registry.uniphore.com/customer-hpe-images/deep-crawler:v-bd43605219
-registry.uniphore.com/customer-hpe-images/document-categorizer:v-765ee9f4c7
-registry.uniphore.com/customer-hpe-images/xforge-db-migrations:v-86af973b41
+registry.uniphore.com/customer-hpe-images/deep-crawler:v-06cadfed98
+registry.uniphore.com/customer-hpe-images/document-categorizer:v-b176d49c8e
+registry.uniphore.com/customer-hpe-images/xforge-db-migrations:v-1afaab368b
 ```
 
 [Step 1](#step-1--mirror-images-and-charts-into-your-registry) walks through pulling, re-tagging, and pushing these to your registry.
@@ -229,8 +229,8 @@ Pull each artifact from Uniphore's Harbor registry using the robot account crede
 2. **Sanity-pull one image and one chart** to confirm the credentials and network egress work end-to-end before you kick off the bulk mirror loop. If either of these fails, fix the underlying issue (firewall, wrong token, wrong project slug) before continuing — you don't want to discover it 12 images in.
 
     ```sh
-    docker pull registry.uniphore.com/customer-hpe-images/x-forge-ui:v-95ad0f2929
-    # → "Status: Downloaded newer image for ...x-forge-ui:v-95ad0f2929"
+    docker pull registry.uniphore.com/customer-hpe-images/x-forge-ui:v-67659ecdef
+    # → "Status: Downloaded newer image for ...x-forge-ui:v-67659ecdef"
 
     helm pull oci://registry.uniphore.com/customer-hpe-charts/guardrails-service \
       --version 0.4.0-vdf7c1ace
@@ -257,20 +257,20 @@ Pull each artifact from Uniphore's Harbor registry using the robot account crede
     DST="registry.example.com/baic"        # your registry — and any namespace/project you want
 
     IMAGES=(
-      "forge-backend:v-a5fd46a64a"
-      "forge-user-management:v-e5a88c390e"
+      "forge-backend:v-6b47a82445"
+      "forge-user-management:v-b893347668"
       "forge-scheduler:v-ae9bf06d0e"
       "forge-api-gateway:v-6fc8dcf1b0"
-      "x-forge-ui:v-95ad0f2929"
-      "forge-question-answer:v-a6082e4173"
-      "evaluation-service:v-7754c8bc2b"
-      "pegasus-inference-api:v-9640234c30"
-      "guardrails-service:v-4f5021217f"
-      "slm-fine-tuning-studio:v-50de83304c"
+      "x-forge-ui:v-67659ecdef"
+      "forge-question-answer:v-82208cd3df"
+      "evaluation-service:v-c315fe70e1"
+      "pegasus-inference-api:v-40c1eb8b43"
+      "guardrails-service:v-b357c2ce22"
+      "slm-fine-tuning-studio:v-49c1599d25"
       "autonomous-entity-label-extraction:v-b9394104cf"
-      "deep-crawler:v-bd43605219"
-      "document-categorizer:v-765ee9f4c7"
-      "xforge-db-migrations:v-86af973b41"
+      "deep-crawler:v-06cadfed98"
+      "document-categorizer:v-b176d49c8e"
+      "xforge-db-migrations:v-1afaab368b"
     )
 
     for img in "${IMAGES[@]}"; do
@@ -290,21 +290,21 @@ Pull each artifact from Uniphore's Harbor registry using the robot account crede
     DST="oci://registry.example.com/baic-charts"   # your OCI-compatible registry
 
     CHARTS=(
-      "uniphore-baic:0.1.1"
-      "xforge-db:0.1.0-v7bf3eea5"
-      "forge-backend:0.1.0-v4f170843"
-      "forge-user-management:0.3.1-v1e67bcd0"
+      "uniphore-baic:0.1.2"
+      "xforge-db:0.1.0-vd4facb00"
+      "forge-backend:0.1.0-v283fbf52"
+      "forge-user-management:0.3.1-v2eb536a6"
       "forge-scheduler:0.2.0-v29230c02"
       "forge-api-gateway:0.2.0-vd3efeb07"
-      "x-forge-ui:0.2.0-ve7702551"
-      "forge-question-answer:0.3.0-v7e68a480"
-      "evaluation-service:0.6.0-va7a27bd2"
-      "pegasus-inference-api:1.4.0-v4ba1f434"
+      "x-forge-ui:0.2.0-ve53e19a4"
+      "forge-question-answer:0.3.0-v9677d889"
+      "evaluation-service:0.6.0-v4539c0d9"
+      "pegasus-inference-api:1.4.0-v5eb5ca4a"
       "guardrails-service:0.4.0-vdf7c1ace"
-      "slm-fine-tuning-studio:0.3.0-v0fe55339"
+      "slm-fine-tuning-studio:0.3.0-v53d24b13"
       "autonomous-entity-label-extraction:0.3.0-vce9fd5db"
       "deep-crawler:0.3.0-v16712cf8"
-      "document-categorizer:0.3.0-vd8c49a51"
+      "document-categorizer:0.3.0-v0aad579d"
     )
 
     mkdir -p /tmp/baic-charts && cd /tmp/baic-charts
@@ -515,7 +515,7 @@ All **inter-service URLs** in the sample (e.g. `forge-backend → forge-question
 After your account team hands you `my-values.yaml`, **pre-flight render the chart with your overlay** to catch typos before you install:
 
 ```sh
-helm template baic oci://registry.example.com/baic-charts/uniphore-baic --version 0.1.0 \
+helm template baic oci://registry.example.com/baic-charts/uniphore-baic --version 0.1.2 \
   --namespace $NAMESPACE \
   -f my-values.yaml > /tmp/rendered.yaml
 
@@ -532,7 +532,7 @@ Install the umbrella chart from the location you pushed it to in [Step 1](#step-
 
 ```sh
 helm install baic oci://registry.example.com/baic-charts/uniphore-baic \
-  --version 0.1.0 \
+  --version 0.1.2 \
   --namespace $NAMESPACE \
   -f my-values.yaml \
   --timeout 20m \
@@ -542,7 +542,7 @@ helm install baic oci://registry.example.com/baic-charts/uniphore-baic \
 **If you kept charts as local `.tgz` files** (Chartmuseum-only or air-gapped):
 
 ```sh
-helm install baic /tmp/baic-charts/uniphore-baic-0.1.0.tgz \
+helm install baic /tmp/baic-charts/uniphore-baic-0.1.2.tgz \
   --namespace $NAMESPACE \
   -f my-values.yaml \
   --timeout 20m \
@@ -669,7 +669,7 @@ After your Ingress is up:
 3. Apply the change:
 
     ```sh
-    helm upgrade baic oci://registry.example.com/baic-charts/uniphore-baic --version 0.1.0 \
+    helm upgrade baic oci://registry.example.com/baic-charts/uniphore-baic --version 0.1.2 \
       --namespace $NAMESPACE \
       -f my-values.yaml \
       --atomic
